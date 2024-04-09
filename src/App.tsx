@@ -1,4 +1,4 @@
-import './App.css'
+import './App.scss'
 import { Link, Outlet } from 'react-router-dom'
 
 function App() {
@@ -6,6 +6,7 @@ function App() {
   return (
     <>
       <header>
+        <img src="/logo.png" className="logo" alt="Logo" />
         <nav>
           <ul>
             <li>

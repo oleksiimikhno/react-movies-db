@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import './MovieCart.scss'
+import styles from './MovieCart.module.scss'
 
 interface MovieCardProps {
   id: number;
@@ -10,10 +10,13 @@ interface MovieCardProps {
 
 export function MovieCard({ id, title, popularity, overview }: MovieCardProps) {
   return (
-    <div className="movie-card">
-      <Link to={`/movies/${id}`}>{title}</Link>
-      <div>{popularity}</div>
-      <div>{overview}</div>
+    <div className={styles.card}>
+      <img className={styles.thumb} src="/movie-thumb.jpg" alt="movie thumb" />
+      <div className={styles.content}>
+        <Link to={`/movies/${id}`}>{title}</Link>
+        <div>{popularity}</div>
+        <div>{overview}</div>
+      </div>
     </div>
   );
 }
