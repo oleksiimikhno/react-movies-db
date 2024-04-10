@@ -6,26 +6,3 @@
   padding: 0 2rem;
   text-align: center;
 }
-
-body, * {
-  box-sizing: border-box;
-}
-
-header {
-  display: flex;
-  ul {
-    display: flex;
-    gap: 10px;
-    list-style: none;
-  }
-}
-
-.logo {
-  height: 50px;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
