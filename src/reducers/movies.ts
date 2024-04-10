@@ -1,4 +1,6 @@
-import { Action, Reducer } from "redux";
+import { client } from "../api/tmdb";
+import { ActionWithPayload, createReducer } from "../redux/utils";
+import { AppThunk } from "../store";
 
 export interface Movie {
   id: number;
@@ -9,41 +11,59 @@ export interface Movie {
 }
 
 interface MovieState {
-  top: Movie[]
+  top: Movie[],
+  loading: boolean;
 }
 
 const initialState: MovieState = {
-  top: [
-    { id: 1, title: "The Godfather", popularity: 9.2, overview: "1972... years after Michael ...", },
-    { id: 2, title: "The Godfather: Part II", popularity: 8.7, overview: "The early life and ..." },
-    { id: 3, title: "The Dark Knight", popularity: 9.0, overview: "When the menace ...", },
-    { id: 4, title: "12 Angry Men", popularity: 8.9, overview: "A jury holdout " },
-  ]
+  top: [],
+  loading: false
 }
 
-export const moviesLoaded = (movies: Movie[]) => ({
+const moviesLoaded = (movies: Movie[]) => ({
   type: 'movies/loaded',
   payload: movies,
 })
 
-interface ActionWithPayload<T> extends Action {
-  payload: T
-}
+const moviesLoading = () => ({
+  type: 'movies/loading'
+})
 
-const moviesReducer: Reducer<MovieState, ActionWithPayload<Movie[]>> = (state, action) => {
-  const currentState = state ?? initialState;
+export function fetchMovies(): AppThunk<Promise<void>> {
+  return async (dispatch, getState) => {
+    dispatch(moviesLoading());
 
-  switch (action.type) {
-    case 'movies/loaded':
-      return {
-        ...currentState,
-        top: action.payload
-      }
-    default:
-      return currentState;
+    const config = await client.getConfiguration();
+    const imageUrl = config.images.base_url;
+    const results = await client.getNowPlayingMovies(); 
+
+    const mappedResults: Movie[] = results.map((movie) => ({
+      id: movie.id,
+      title: movie.title,
+      popularity: movie.popularity,
+      overview: movie.overview,
+      image: (movie.backdrop_path) ? `${imageUrl}w780${movie.backdrop_path}`: undefined,
+    }));
+
+    dispatch(moviesLoaded(mappedResults));
   }
-
-  return initialState;
 }
+
+const moviesReducer = createReducer<MovieState>(initialState, {
+  'movies/loaded': (state, action: ActionWithPayload<Movie[]>) => {
+    return {
+      ...state,
+      top: action.payload,
+      loading: false
+    }
+  },
+  'movies/loading': (state, action) => {
+    return {
+      ...state,
+      top: action.payload,
+      loading: true
+    }
+  }
+});
 
 export default moviesReducer;
